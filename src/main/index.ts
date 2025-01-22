@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -60,6 +60,29 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  function createEchoServerProcesses(event, host, port, message): void {
+    const instance = spawn('./src/processes/echo_server/echo_server', [host, port, message])
+    instance.on('error', (err) => {
+      console.error(`Failed to start subprocess. ${err}`)
+    })
+  
+    instance.on('spawn', () => {
+      console.log(`Echo server started with pid: ${instance.pid}`)
+      event.reply('echo-server:success', {
+        pid: instance.pid,
+        host,
+        port,
+        message
+      })
+    })
+  }
+  
+  // Event listener for creating echo server processes
+  ipcMain.on('echo-server:create', createEchoServerProcesses)
+
+
+
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -69,28 +92,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+
 })
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-
-
-function createEchoServerProcesses(host, port, message): void {
-  const instance = spawn('./src/processes/echo_server/echo_server', [host, port, message])
-
-  instance.on('error', (err) => {
-    console.error(`Failed to start subprocess. ${err}`)
-    return false
-  })
-
-  instance.on('spawn', () => {
-    console.log(`Echo server started with pid: ${instance.pid}`)
-    return true
-  })
-}
-
-ipcMain.on('echo-server:create', (e, host, port, message) => {
-  console.log(`Creating echo server with host: ${host}, port: ${port}, message: ${message}`)
-  e.returnValue = createEchoServerProcesses(host, port, message)
-  e.reply('echo-server:success', e.returnValue)
-})

@@ -28,12 +28,23 @@ export default function NewEchoServerView(): ReactElement {
   }
 
   useEffect(() => {
-    ipc.on('echo-server:success', (e, pid) => {
-      navigate(`/${pid}`)
+    ipc.on('echo-server:success', (e, processMetadata) => {
+      console.log('Received process: ', processMetadata)
+      navigate(`/${processMetadata.pid}`)
     })
 
     return (): void => {
       ipc.removeAllListeners('echo-server:success')
+    }
+  }, [])
+
+  useEffect(() => {
+    ipc.on('echo-server:info', (e, info) => {
+      console.log('Received info: ', info)
+    })
+
+    return (): void => {
+      ipc.removeAllListeners('echo-server:info')
     }
   }, [])
 
