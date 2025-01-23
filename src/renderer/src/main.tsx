@@ -3,12 +3,12 @@ import './assets/main.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { createHashRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, createHashRouter, RouterProvider } from 'react-router-dom'
 import InstructionView from './views/InstructionView'
 import NewEchoServerView from './views/NewEchoServerView'
 import EchoServerView from './views/EchoServerView'
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,

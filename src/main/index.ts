@@ -18,11 +18,32 @@ function createWindow(): void {
     }
   })
 
+  const processWindow = new BrowserWindow({
+    width: 900,
+    height: 670,
+    show: false,
+    autoHideMenuBar: true,
+    ...(process.platform === 'linux' ? { icon } : {}),
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false
+    }
+  })
+
+  processWindow.on('ready-to-show', () => {
+    processWindow.show()
+  })
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url)
+    return { action: 'deny' }
+  })
+
+  processWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
@@ -33,6 +54,14 @@ function createWindow(): void {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    console.log("PROCESS WINDOW", join(process.env['ELECTRON_RENDERER_URL'], '/43432'))
+    processWindow.loadURL(join(process.env['ELECTRON_RENDERER_URL'], '/43432'))
+    console.log("PROCESS WINDOW: URL", processWindow.webContents.getURL())
+  } else {
+    processWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
 
