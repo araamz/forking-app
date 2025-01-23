@@ -1,5 +1,4 @@
 import './assets/main.css'
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
@@ -8,7 +7,7 @@ import InstructionView from './views/InstructionView'
 import NewEchoServerView from './views/NewEchoServerView'
 import EchoServerView from './views/EchoServerView'
 
-const router = createBrowserRouter([
+const routing = [
   {
     path: '/',
     element: <App />,
@@ -27,7 +26,11 @@ const router = createBrowserRouter([
       }
     ]
   }
-])
+]
+
+const router = import.meta.env.development
+  ? createHashRouter(routing)
+  : createBrowserRouter(routing)
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
