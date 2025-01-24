@@ -28,10 +28,12 @@ function createMainWindow(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.loadURL(join(process.env['ELECTRON_RENDERER_URL'], '/main'))
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    const appUrl = 'file:/' + __dirname + '/renderer/index.html/#/main'
+    console.log(appUrl)
+    mainWindow.loadURL(appUrl)
   }
 }
 
-export default createMainWindow;
+export default createMainWindow

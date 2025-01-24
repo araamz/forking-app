@@ -2,6 +2,7 @@ import icon from '../../resources/icon.png?asset'
 import { shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { spawn } from 'child_process'
 
 function createProcessWindow(pid: string): void {
   const processWindow = new BrowserWindow({
@@ -36,7 +37,6 @@ function createProcessWindow(pid: string): void {
     processWindow.loadURL(processWindowURL)
   } else {
     processWindow.loadFile(join(__dirname, '../renderer/index.html'))
-    processWindow.loadURL(processWindowURL)
   }
 }
 

@@ -9,7 +9,7 @@ import EchoServerView from './views/EchoServerView'
 
 const routing = [
   {
-    path: '/',
+    path: '/main',
     element: <App />,
     children: [
       {
@@ -21,16 +21,19 @@ const routing = [
         element: <NewEchoServerView />
       },
       {
-        path: ':pid',
+        path: 'process/:pid',
         element: <EchoServerView />
       }
     ]
+  },
+  {
+    path: '/process/:pid',
+    element: <EchoServerView />
   }
 ]
 
-const router = import.meta.env.development
-  ? createHashRouter(routing)
-  : createBrowserRouter(routing)
+const router =
+  import.meta.env.MODE === 'production' ? createHashRouter(routing) : createBrowserRouter(routing)
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

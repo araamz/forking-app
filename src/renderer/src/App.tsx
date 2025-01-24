@@ -5,6 +5,7 @@ import { MouseEvent as ReactMouseEvent } from 'react'
 
 function App(): JSX.Element {
 
+  /*
   const navigate = useNavigate()
 
   const handleCreate = (e: ReactMouseEvent<HTMLButtonElement>): void => {
@@ -15,12 +16,13 @@ function App(): JSX.Element {
   const handleViewPID = (pid: string): void => {
     navigate(`/${pid}`)
   }
+  */
 
   return (
     <>
       <div className="w-screen h-screen bg-gray-100 flex flex-col">
         <ControlBar>
-          <BarButton onClick={(e) => handleCreate(e)}>Create</BarButton>
+          <BarButton>Create</BarButton>
           <BarButton>14476</BarButton>
           <BarButton>14476</BarButton>
         </ControlBar>
