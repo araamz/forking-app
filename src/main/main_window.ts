@@ -30,7 +30,7 @@ function createMainWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(join(process.env['ELECTRON_RENDERER_URL'], '/main'))
   } else {
-    const appUrl = 'file:/' + __dirname + '/renderer/index.html/#/main'
+    const appUrl = `file://${join(__dirname, '../renderer/index.html#/main')}`
     console.log(appUrl)
     mainWindow.loadURL(appUrl)
   }

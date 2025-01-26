@@ -26,7 +26,7 @@ function createProcessWindow(pid: string): void {
     return { action: 'deny' }
   })
 
-  const processRoute = `/${pid}`
+  const processRoute = `process/${pid}`
   const processWindowURL =
     is.dev && process.env['ELECTRON_RENDERER_URL']
       ? join(process.env['ELECTRON_RENDERER_URL'], processRoute)
@@ -36,7 +36,8 @@ function createProcessWindow(pid: string): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     processWindow.loadURL(processWindowURL)
   } else {
-    processWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    const appUrl = `file://${join(__dirname, `../renderer/index.html#/process/${pid}`)}`
+    processWindow.loadURL(appUrl)
   }
 }
 

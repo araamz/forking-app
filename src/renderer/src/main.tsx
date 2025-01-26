@@ -19,10 +19,6 @@ const routing = [
       {
         path: 'new',
         element: <NewEchoServerView />
-      },
-      {
-        path: 'process/:pid',
-        element: <EchoServerView />
       }
     ]
   },
@@ -34,7 +30,7 @@ const routing = [
 
 const router =
   import.meta.env.MODE === 'production' ? createHashRouter(routing) : createBrowserRouter(routing)
-
+console.log(import.meta.env.MODE === 'production')
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <RouterProvider router={router} />
