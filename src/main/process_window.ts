@@ -1,10 +1,10 @@
 import icon from '../../resources/icon.png?asset'
 import { shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { is } from '@electron-toolkit/utils'
 import { spawn } from 'child_process'
 
-function createProcessWindow(pid: string): void {
+function createProcessWindow(route: string, pid: string): void {
   const processWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -12,8 +12,8 @@ function createProcessWindow(pid: string): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      preload: join('', join(__dirname, 'preload/index.js')),
+      sandbox: true
     }
   })
 
@@ -36,8 +36,8 @@ function createProcessWindow(pid: string): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     processWindow.loadURL(processWindowURL)
   } else {
-    const appUrl = `file://${join(__dirname, `../renderer/index.html#/process/${pid}`)}`
-    processWindow.loadURL(appUrl)
+    const buildLocation = `file://${join(__dirname, `../renderer/index.html#/${route}/${pid}`)}`
+    processWindow.loadURL(buildLocation)
   }
 }
 
@@ -45,7 +45,6 @@ function createEchoServerProcesses(event, host, port, message): void {
   const instance = spawn('./src/processes/echo_server/echo_server', [host, port, message])
 
   const webCotnents = event.sender
-  const window = BrowserWindow.fromWebContents(webCotnents)
 
   instance.on('error', (err) => {
     console.error(`Failed to start subprocess. ${err}`)

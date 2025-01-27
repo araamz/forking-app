@@ -10,7 +10,7 @@ export default function NewEchoServerView(): ReactElement {
   const [message, setMessage] = useState<string>('')
   const navigate = useNavigate()
 
-  const ipc = window.electron.ipcRenderer
+  const echoProcessAPI = window.api
 
   const handleHostChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setHost(event.target.value)
@@ -23,21 +23,11 @@ export default function NewEchoServerView(): ReactElement {
   }
 
   const handleCreate = (): void => {
+    console.log(echoProcessAPI)
     console.log(`host: ${host}, port: ${port}, message: ${message}`)
-    ipc.send('echo-server:create', host, port, message)
+    echoProcessAPI.createEchoServerProcesses(host, port, message)
   }
-
-  useEffect(() => {
-    ipc.on('echo-server:success', (e, processMetadata) => {
-      console.log('Received process: ', processMetadata)
-      navigate(`/${processMetadata.pid}`)
-    })
-
-    return (): void => {
-      ipc.removeAllListeners('echo-server:success')
-    }
-  }, [])
-
+/*
   useEffect(() => {
     ipc.on('echo-server:info', (e, info) => {
       console.log('Received info: ', info)
@@ -46,7 +36,7 @@ export default function NewEchoServerView(): ReactElement {
     return (): void => {
       ipc.removeAllListeners('echo-server:info')
     }
-  }, [])
+  }, [])*/
 
   return (
     <div className="flex flex-col gap-4">
