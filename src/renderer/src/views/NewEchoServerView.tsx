@@ -11,6 +11,8 @@ export default function NewEchoServerView(): ReactElement {
   const [message, setMessage] = useState<string>('')
   const navigate = useNavigate()
 
+  const launchChannel = 'echo-server:launch'
+  const launchedChannel = 'echo-server:launched'
   const echoProcessAPI = window.api
 
   const handleHostChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -26,20 +28,16 @@ export default function NewEchoServerView(): ReactElement {
   const handleCreate = (): void => {
     console.log(echoProcessAPI)
     console.log(`host: ${host}, port: ${port}, message: ${message}`)
-    echoProcessAPI.createEchoServerProcesses(host, port, message)
+    echoProcessAPI.send(launchChannel, host, port, message)
   }
 
-  
-
   useEffect(() => {
-    const ipcCall = echoProcessAPI.onEchoServerInfo((event, pid, message) => {
+    const processStatus = echoProcessAPI.receive(launchedChannel, (event, pid, host, port, message) => {
       console.log("UseEffect: event", event)
-      console.log(`UseEffect: pid: ${pid}, message: ${message}`)
+      console.log(`UseEffect: pid: ${pid}, message: ${message}, host: ${host}, port: ${port}`)
     })
 
-    return (): void => {
-      ipcCall()
-    }
+    return (): void => processStatus()
   }, [])
 
   return (

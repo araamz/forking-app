@@ -2,7 +2,10 @@ import icon from '../../resources/icon.png?asset'
 import { shell, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-import { spawn } from 'child_process'
+import { ChildProcess, spawn } from 'child_process'
+import { echoProcessChannels, EchoProcessChannel } from '../preload'
+
+const echoServers: Record<number, ChildProcess> = {}
 
 function createProcessWindow(route: string, pid: string): void {
   const processWindow = new BrowserWindow({
@@ -43,22 +46,31 @@ function createProcessWindow(route: string, pid: string): void {
 
 function createEchoServerProcesses(event, host, port, message): void {
   const instance = spawn('./src/processes/echo_server/echo_server', [host, port, message])
-
-  const webContents = event.sender
-
+  
   instance.on('error', (err) => {
     console.error(`Failed to start subprocess. ${err}`)
+    event.reply('echo-server:launch-failed', err.message)
   })
 
   instance.on('spawn', () => {
-    console.log(`Echo server started with host: ${host}, port: ${port}, message: ${message}`)
-    console.log(`Echo server started with pid: ${instance.pid}`)
-    webContents.send('echo-server:info', 'test')
-    event.reply('echo-server:success', instance.pid, message)
+    if (instance.pid === undefined) {
+      event.reply('echo-server:launch-failed', 'Failed to get pid')
+      throw new Error('Failed to get pid')
+    }
+    echoServers[instance.pid] = instance
+    console.log(
+      `Echo server started with: pid: ${instance.pid}, host: ${host}, port: ${port}, message: ${message}`
+    )
+    console.log(
+      'Echo servers count:',
+      Object.entries(echoServers).length,
+      Object.entries(echoServers)
+    )
+    event.reply('echo-server:launched', instance.pid, host, port, message)
   })
 }
 
 // Event listener for creating echo server processes
-ipcMain.on('echo-server:create', createEchoServerProcesses)
+ipcMain.on('echo-server:launch', createEchoServerProcesses)
 
 export default createProcessWindow

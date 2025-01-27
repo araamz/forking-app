@@ -1,24 +1,42 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
+export type EchoProcessChannel = 
+  | 'echo-server:info'
+  | 'echo-server:launch'
+  | 'echo-server:launched'
+  | 'echo-server:launch-failed'
+  | 'echo-server:destroy'
+  | 'echo-server:destroyed'
+
+export const echoProcessChannels: EchoProcessChannel[] = [
+  'echo-server:info',
+  'echo-server:launch',
+  'echo-server:launched',
+  'echo-server:launch-failed',
+  'echo-server:destroy',
+  'echo-server:destroyed'
+];
+
 // Custom APIs for renderer
 const api = {
-  createEchoServerProcesses: (host: string, port: number, message: string): void =>
-    ipcRenderer.send('echo-server:create', host, port, message),
-  destroyEchoServerProcesses: (pid: number): void => ipcRenderer.send('echo-server:destroy', pid),
-  updateEchoServerProcesses: (pid: number, message: string): void =>
-    ipcRenderer.send('echo-server:update', pid, message),
-  onEchoServerInfo: (callback): () => Electron.IpcRenderer => {
-    const subscription: (e, pid, host, port, message) => Electron.IpcRenderer = (
-      e: Electron.IpcRendererEvent,
-      pid: number,
-      host: string,
-      port: number,
-      message: string
-    ) => callback(e, pid, host, port, message)
+  send: (channel: EchoProcessChannel, ...args): void => {
+    if (!echoProcessChannels.includes(channel)) {
+      throw new Error(`Invalid send channel: ${channel}`)
+    }
 
-    ipcRenderer.on('echo-server:success', subscription)
-    return () => ipcRenderer.removeListener('echo-server:success', subscription)
+    ipcRenderer.send(channel, ...args)
+  },
+  receive: (channel: EchoProcessChannel, callback): (() => Electron.IpcRenderer) => {
+    if (!echoProcessChannels.includes(channel)) {
+      throw new Error(`Invalid receive channel: ${channel}`)
+    }
+
+    const subscription = (event, ...args): (() => void) => callback(event, ...args)
+
+    ipcRenderer.on(channel, subscription)
+
+    return () => ipcRenderer.removeListener(channel, subscription)
   }
 }
 
