@@ -1,6 +1,7 @@
 import ActionButton from '@renderer/components/ActionButton'
 import InputForm from '@renderer/components/InputForm'
 import Title from '@renderer/components/Title'
+import { ipcRenderer } from 'electron'
 import { ReactElement, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -27,16 +28,19 @@ export default function NewEchoServerView(): ReactElement {
     console.log(`host: ${host}, port: ${port}, message: ${message}`)
     echoProcessAPI.createEchoServerProcesses(host, port, message)
   }
-/*
+
+  
+
   useEffect(() => {
-    ipc.on('echo-server:info', (e, info) => {
-      console.log('Received info: ', info)
+    const ipcCall = echoProcessAPI.onEchoServerInfo((event, pid, message) => {
+      console.log("UseEffect: event", event)
+      console.log(`UseEffect: pid: ${pid}, message: ${message}`)
     })
 
     return (): void => {
-      ipc.removeAllListeners('echo-server:info')
+      ipcCall()
     }
-  }, [])*/
+  }, [])
 
   return (
     <div className="flex flex-col gap-4">

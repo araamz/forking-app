@@ -8,12 +8,18 @@ const api = {
   destroyEchoServerProcesses: (pid: number): void => ipcRenderer.send('echo-server:destroy', pid),
   updateEchoServerProcesses: (pid: number, message: string): void =>
     ipcRenderer.send('echo-server:update', pid, message),
-  onEchoServerInfo: (callback): Electron.IpcRenderer =>
-    ipcRenderer.on(
-      'echo-server:info',
-      (e: Electron.IpcRendererEvent, pid: number, message: string, timestamp: string) =>
-        callback(e, pid, message, timestamp)
-    )
+  onEchoServerInfo: (callback): () => Electron.IpcRenderer => {
+    const subscription: (e, pid, host, port, message) => Electron.IpcRenderer = (
+      e: Electron.IpcRendererEvent,
+      pid: number,
+      host: string,
+      port: number,
+      message: string
+    ) => callback(e, pid, host, port, message)
+
+    ipcRenderer.on('echo-server:success', subscription)
+    return () => ipcRenderer.removeListener('echo-server:success', subscription)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

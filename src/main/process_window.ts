@@ -1,5 +1,5 @@
 import icon from '../../resources/icon.png?asset'
-import { shell, BrowserWindow, ipcMain } from 'electron'
+import { shell, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { spawn } from 'child_process'
@@ -12,7 +12,7 @@ function createProcessWindow(route: string, pid: string): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join('', join(__dirname, 'preload/index.js')),
+      preload: join(__dirname, '../preload/index.js'),
       sandbox: true
     }
   })
@@ -44,21 +44,17 @@ function createProcessWindow(route: string, pid: string): void {
 function createEchoServerProcesses(event, host, port, message): void {
   const instance = spawn('./src/processes/echo_server/echo_server', [host, port, message])
 
-  const webCotnents = event.sender
+  const webContents = event.sender
 
   instance.on('error', (err) => {
     console.error(`Failed to start subprocess. ${err}`)
   })
 
   instance.on('spawn', () => {
+    console.log(`Echo server started with host: ${host}, port: ${port}, message: ${message}`)
     console.log(`Echo server started with pid: ${instance.pid}`)
-    webCotnents.send('echo-server:info', 'test')
-    event.reply('echo-server:success', {
-      pid: instance.pid,
-      host,
-      port,
-      message
-    })
+    webContents.send('echo-server:info', 'test')
+    event.reply('echo-server:success', instance.pid, message)
   })
 }
 

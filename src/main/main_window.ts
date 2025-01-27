@@ -17,8 +17,6 @@ function createMainWindow(route: string): void {
     }
   })
 
-  console.log("proload path", 'file://' + '../preload/index.js')
-
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
