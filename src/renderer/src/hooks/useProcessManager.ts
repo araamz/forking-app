@@ -1,7 +1,18 @@
+import { useEffect, useState } from "react";
 
 interface IUseProcessManager {
-    processList: Array<>;
+    processPids: Array<number>;
 }
-export default function useProcessManager() {
+export default function useProcessManager(): Array<number> {
+
+    const [pids, setPids] = useState<number>([])
+    
+    useEffect(() => {
+
+    }, [])
+
+    useEffect(() => {
+
+    }, [])
 
 }
