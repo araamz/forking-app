@@ -57,7 +57,8 @@ function createProcessWindow(route: string, pid: string): BrowserWindow {
 }
 
 function createEchoServerProcesses(event, host, port, message): void {
-  const instance = spawn('./src/processes/echo_server/echo_server', [host, port, message])
+  const aarch64_apple_darwin = './src/processes/echo_server/echo_server_aarch64-apple-darwin'
+  const instance = spawn(aarch64_apple_darwin, [host, port, message])
 
   instance.on('error', (err) => {
     console.error(`Failed to start subprocess. ${err}`)
