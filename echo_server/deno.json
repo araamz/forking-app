@@ -1,9 +1,9 @@
 {
   "tasks": {
     "dev": "deno run --watch main.ts",
-    "build:mac-intel": "deno compile --target x86_64-apple-darwin --allow-net --allow-read --allow-env --output ./../src/processes/echo_server/echo_server_x86_64-apple-darwin main.ts",
-    "build:mac-apple": "deno compile --target aarch64-apple-darwin --allow-net --allow-read --allow-env --output ./../src/processes/echo_server/echo_server_aarch64-apple-darwin main.ts",
-    "build:windows": "deno compile --target x86_64-pc-windows-msvc --allow-net --allow-read --allow-env --output ./../src/processes/echo_server/x86_64-pc-windows-msvc main.ts"
+    "build:mac-intel": "deno compile --target x86_64-apple-darwin --allow-net --allow-read --allow-env --output ./../resources/processes/echo_server/echo_server_x86_64-apple-darwin main.ts",
+    "build:mac-apple": "deno compile --target aarch64-apple-darwin --allow-net --allow-read --allow-env --output ./../resources/processes/echo_server/echo_server_aarch64-apple-darwin main.ts",
+    "build:windows": "deno compile --target x86_64-pc-windows-msvc --allow-net --allow-read --allow-env --output ./../resources/processes/echo_server/x86_64-pc-windows-msvc main.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",

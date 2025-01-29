@@ -4,6 +4,7 @@ import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { ChildProcess, spawn } from 'child_process'
 import { windows } from '.'
+import echo_server_binary from '../../resources/processes/echo_server/echo_server_aarch64-apple-darwin?asset&asarUnpack'
 
 const echoServers: Record<
   number,
@@ -57,7 +58,7 @@ function createProcessWindow(route: string, pid: string): BrowserWindow {
 }
 
 function createEchoServerProcesses(event, host, port, message): void {
-  const aarch64_apple_darwin = './src/processes/echo_server/echo_server_aarch64-apple-darwin'
+  const aarch64_apple_darwin = echo_server_binary
   const instance = spawn(aarch64_apple_darwin, [host, port, message])
 
   instance.on('error', (err) => {

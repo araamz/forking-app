@@ -11,6 +11,7 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+  - src/processes/echo_server/**
 win:
   executableName: forking-app
 nsis:
