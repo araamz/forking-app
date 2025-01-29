@@ -128,8 +128,8 @@ function destoryEchoProcess(event, processPID): void {
 }
 
 function killAllEchoProcesses(): void {
-  Object.entries(echoServers).forEach(([_key, value]) => {
-    value.instance.kill()
+  Object.entries(echoServers).forEach(([_key, echoServer]) => {
+    echoServer.instance.kill()
   })
 }
 

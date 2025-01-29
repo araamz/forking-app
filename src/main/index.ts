@@ -25,7 +25,8 @@ app.whenReady().then(() => {
   windows.push({
     instance: createMainWindow('/main'),
     type: 'main',
-    label: 'main'})
+    label: 'main'
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

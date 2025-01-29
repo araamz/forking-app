@@ -11,10 +11,6 @@ function App(): JSX.Element {
   const pids = useProcessManager()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    console.log("PIDs Update", pids)
-  }, [pids])
-
   const handleCreate = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
     navigate('/main/new')
