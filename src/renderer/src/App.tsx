@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import BarButton from './components/ActionButton'
 import ControlBar from './components/ControlBar'
-import { MouseEvent } from 'react'
+import { MouseEvent, useEffect } from 'react'
 import useProcessManager, { IProcessObject } from './hooks/useProcessManager'
 
 function App(): JSX.Element {
@@ -10,6 +10,10 @@ function App(): JSX.Element {
   const echoProcessAPI = window.api
   const pids = useProcessManager()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    console.log("PIDs Update", pids)
+  }, [pids])
 
   const handleCreate = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()

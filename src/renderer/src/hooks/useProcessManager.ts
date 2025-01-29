@@ -18,11 +18,9 @@ export default function useProcessManager(): Array<IProcessObject> {
     const processStatus = echoProcessAPI.receive(
       launchedChannel,
       (_event: Electron.IpcRenderer, processObject: IProcessObject) => {
-        console.log('Process Launched:', processObject)
         setPids((prevState: Array<IProcessObject>) => {
           // Check if the process already exists
           if (!prevState.some((item) => item.pid === processObject.pid)) {
-            console.log('Adding process', processObject.pid)
             return [...prevState, processObject]
           }
           return prevState
@@ -31,7 +29,6 @@ export default function useProcessManager(): Array<IProcessObject> {
     )
 
     return (): void => {
-      console.log('Cleanup launchedChannel listener')
       processStatus()
     }
   }, []) // Empty dependency array so it runs only once when the component mounts
@@ -43,7 +40,7 @@ export default function useProcessManager(): Array<IProcessObject> {
       (_event: Electron.IpcRenderer, pid: number) => {
         console.log('Process Destroyed:', pid)
         setPids((prevState: Array<IProcessObject>) => {
-          return prevState.filter((processItem) => processItem.pid !== pid)
+          return [...prevState.filter((processItem) => String(processItem.pid) !== String(pid))]
         })
       }
     )
