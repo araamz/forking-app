@@ -4,7 +4,10 @@ import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { ChildProcess, spawn } from 'child_process'
 import { windows } from '.'
-import echo_server_binary from '../../resources/processes/echo_server/echo_server_aarch64-apple-darwin?asset&asarUnpack'
+import os from 'os'
+import echo_server_binary_aarch64_apple_darwin from '../../resources/processes/echo_server/echo_server_aarch64-apple-darwin?asset&asarUnpack'
+import echo_server_binary_x86_64_apple_darwin from '../../resources/processes/echo_server/echo_server_aarch64-apple-darwin?asset&asarUnpack'
+import echo_server_binary_x86_64_pc_windows from '../../resources/processes/echo_server/echo_server_aarch64-apple-darwin?asset&asarUnpack'
 
 const echoServers: Record<
   number,
@@ -14,6 +17,14 @@ const echoServers: Record<
     port: number
   }
 > = {}
+
+function loadEchoServerBinary(): string {
+  if (os.platform() === 'darwin' && os.arch() === 'arm64')
+    return echo_server_binary_aarch64_apple_darwin
+  else if (os.platform() === 'darwin' && os.arch() === 'x64')
+    return echo_server_binary_x86_64_apple_darwin
+  else return echo_server_binary_x86_64_pc_windows
+}
 
 function createProcessWindow(route: string, pid: string): BrowserWindow {
   const processWindow = new BrowserWindow({
@@ -58,8 +69,7 @@ function createProcessWindow(route: string, pid: string): BrowserWindow {
 }
 
 function createEchoServerProcesses(event, host, port, message): void {
-  const aarch64_apple_darwin = echo_server_binary
-  const instance = spawn(aarch64_apple_darwin, [host, port, message])
+  const instance = spawn(loadEchoServerBinary(), [host, port, message])
 
   instance.on('error', (err) => {
     console.error(`Failed to start subprocess. ${err}`)
