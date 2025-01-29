@@ -10,6 +10,8 @@ This project was created to be a basis and a guide to Electron for Team #09: Wav
 # Application Background
 The Forking-App is a Electron application composed of two primary systems being the application itself and the Echo Server. The Electron application spawns or kills one or more echo servers in which echo a message. Additionally, the Electron application is capable of communicating individually to these echo servers to update the message assigned to an echo server. The Echo Server script is located under the `echo_server` folder while everything else is for the Forking-App.
 
+![alt System Overview](diagrams/SystemOverview.png "System Overview")
+
 ## Echo Server Design
 The Echo Server is a REST API that features only two endpoints being the following:
 - `GET: /`: This endpoint returns a JSON message composed of two keys being `message` and `changed`. `message` is the message held by the echo server and `changed` is a timestamp for when the message was last assigned.
