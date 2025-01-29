@@ -1,7 +1,12 @@
 import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import createMainWindow from './main_window'
-import createProcessWindow from './process_window'
+
+export const windows: Array<{
+  instance: BrowserWindow
+  type: 'main' | 'process'
+  label: string
+}> = []
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -17,7 +22,10 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  createMainWindow('/main')
+  windows.push({
+    instance: createMainWindow('/main'),
+    type: 'main',
+    label: 'main'})
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

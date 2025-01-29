@@ -1,20 +1,25 @@
 import icon from '../../resources/icon.png?asset'
-import { shell, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
+import { shell, BrowserWindow, ipcMain, app } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { ChildProcess, spawn } from 'child_process'
+import { windows } from '.'
 
-const echoServers: Record<number, {
-  instance: ChildProcess,
-  host: string,
-  port: number
-}> = {}
+const echoServers: Record<
+  number,
+  {
+    instance: ChildProcess
+    host: string
+    port: number
+  }
+> = {}
 
-function createProcessWindow(route: string, pid: string): void {
+function createProcessWindow(route: string, pid: string): BrowserWindow {
   const processWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 500,
+    height: 370,
     show: false,
+    resizable: false,
     title: `Process ${pid}`,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -47,11 +52,13 @@ function createProcessWindow(route: string, pid: string): void {
     const buildLocation = `file://${join(__dirname, `../renderer/index.html#/${route}/${pid}`)}`
     processWindow.loadURL(buildLocation)
   }
+
+  return processWindow
 }
 
 function createEchoServerProcesses(event, host, port, message): void {
   const instance = spawn('./src/processes/echo_server/echo_server', [host, port, message])
-  
+
   instance.on('error', (err) => {
     console.error(`Failed to start subprocess. ${err}`)
     event.reply('echo-server:launch-failed', err.message)
@@ -87,17 +94,37 @@ function createEchoServerProcesses(event, host, port, message): void {
 function sendEchoProcessInformation(event, processPID): void {
   console.log(echoServers[processPID])
   const process = echoServers[processPID]
-  
+
   event.reply('echo-server:info', {
-    pid: process.pid,
+    pid: processPID,
     host: process.host,
     port: process.port
   })
+}
 
+function destoryEchoProcess(event, processPID): void {
+  const window = BrowserWindow.fromId(event.sender.id)
+  const process = echoServers[processPID]
+  const successfully_killed = process.instance.kill()
+  if (successfully_killed && window) {
+    window.close()
+    const process_window_index = windows.findIndex((windowItem) => windowItem.label === processPID)
+    windows.splice(process_window_index, 1)
+    const main_window = windows.find((windowItem) => windowItem.type === 'main')
+    main_window?.instance.webContents.send('echo-server:destroyed', processPID)
+  } else console.error(`Could not find process viewer window for ${processPID}`)
+}
+
+function killAllEchoProcesses(): void {
+  Object.entries(echoServers).forEach(([_key, value]) => {
+    value.instance.kill()
+  })
 }
 
 // Event listener for creating echo server processes
 ipcMain.on('echo-server:launch', createEchoServerProcesses)
 ipcMain.on('echo-server:info', sendEchoProcessInformation)
+ipcMain.on('echo-server:destroy', destoryEchoProcess)
+app.on('quit', killAllEchoProcesses)
 
 export default createProcessWindow
