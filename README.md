@@ -32,12 +32,13 @@ The Echo Server application is compiled down to a binary used by the Electron ap
 - react
 - react-router-dom@6
 
-### Primary Operations
+### Main Operations
 - **Starting Electron Application:** This operation invovles instantiation of Electron's app instance.
 - **Creating Main Window:**: This operation involves instantiation of a Browser Window object and saving that instance for later usage. 
-- **Creating Process Window:**This operation involves creating a 
-- **Viewing Echo Server:** 
-- **Ending Echo Server Process:**
-- **Updating Echo Server Message:**
-- **Updating PID List:**
-- **Stopping Electron Application:**
+- **Spawning Echo Server**: This operation involves communication between the main process and renderer to spawn a children process of the echo server binary with argument variables. Additionally, it includes communication between the main process and renderer process to watch for the successful launch of an echo server instance.
+- **Creating Process Window:** This operation involves instantiation of a Browswer Window object and saving that instance for later usage. Additionally, it involes the rendering of the route for that window and passing in parameters that can be used to initialize the process window without the need of using the Main Window's state. 
+- **Viewing Echo Server:** This operation involves communication between the main process and renderer process to display information pertaining to a echo server's state using the REST API.
+- **Ending Echo Server Process:** This operation involves communication between the renderer process and main process to end an echo server instance and update state accordingly in the main process window. 
+- **Updating Echo Server Message:** This operation invovles the renderer process interacting with a echo server's REST API by calling on the update endpoint to update the message and show that successful update in the Process Window. 
+- **Updating PID List:** This operation involves communication between the renderer process and main process to ensure the PID list in the Main Window reflects active echo servers by manually updating the state based upon events between the processes.
+- **Stopping Electron Application:**: This operation involves the closure of the application ensuring a graceful shutdown of active echo servers (thus not leaving any orphan/zombie processes) behind.
