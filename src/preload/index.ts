@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 export type EchoProcessChannel = 
+  | 'main-maindow:open-process-viewer'
   | 'echo-server:info'
   | 'echo-server:launch'
   | 'echo-server:launched'
@@ -10,6 +11,7 @@ export type EchoProcessChannel =
   | 'echo-server:destroyed'
 
 export const echoProcessChannels: EchoProcessChannel[] = [
+  'main-maindow:open-process-viewer',
   'echo-server:info',
   'echo-server:launch',
   'echo-server:launched',

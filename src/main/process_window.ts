@@ -3,20 +3,25 @@ import { shell, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { ChildProcess, spawn } from 'child_process'
-import { echoProcessChannels, EchoProcessChannel } from '../preload'
 
-const echoServers: Record<number, ChildProcess> = {}
+const echoServers: Record<number, {
+  instance: ChildProcess,
+  host: string,
+  port: number
+}> = {}
 
 function createProcessWindow(route: string, pid: string): void {
   const processWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
+    title: `Process ${pid}`,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: true
+      sandbox: false,
+      contextIsolation: true
     }
   })
 
@@ -57,7 +62,12 @@ function createEchoServerProcesses(event, host, port, message): void {
       event.reply('echo-server:launch-failed', 'Failed to get pid')
       throw new Error('Failed to get pid')
     }
-    echoServers[instance.pid] = instance
+    echoServers[instance.pid] = {
+      instance: instance,
+      host: host,
+      port: port
+    }
+
     console.log(
       `Echo server started with: pid: ${instance.pid}, host: ${host}, port: ${port}, message: ${message}`
     )
@@ -66,11 +76,28 @@ function createEchoServerProcesses(event, host, port, message): void {
       Object.entries(echoServers).length,
       Object.entries(echoServers)
     )
-    event.reply('echo-server:launched', instance.pid, host, port, message)
+    event.reply('echo-server:launched', {
+      pid: instance.pid,
+      host: host,
+      port: port
+    })
   })
+}
+
+function sendEchoProcessInformation(event, processPID): void {
+  console.log(echoServers[processPID])
+  const process = echoServers[processPID]
+  
+  event.reply('echo-server:info', {
+    pid: process.pid,
+    host: process.host,
+    port: process.port
+  })
+
 }
 
 // Event listener for creating echo server processes
 ipcMain.on('echo-server:launch', createEchoServerProcesses)
+ipcMain.on('echo-server:info', sendEchoProcessInformation)
 
 export default createProcessWindow

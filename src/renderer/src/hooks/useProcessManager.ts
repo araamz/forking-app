@@ -1,18 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
-interface IUseProcessManager {
-    processPids: Array<number>;
+export interface IProcessObject {
+  pid: number
+  host: string
+  port: number
 }
-export default function useProcessManager(): Array<number> {
+export default function useProcessManager(): Array<IProcessObject> {
+  const echoProcessAPI = window.api
+  const launchedChannel = 'echo-server:launched'
 
-    const [pids, setPids] = useState<number>([])
-    
-    useEffect(() => {
+  const [pids, setPids] = useState<Array<IProcessObject>>([])
 
-    }, [])
+  useEffect(() => {
+    const processStatus = echoProcessAPI.receive(
+      launchedChannel,
+      (_event: Electron.IpcRenderer, processObject) => {
+        setPids((prevState: Array<IProcessObject>) => {
+          return [...prevState, processObject]
+        })
+      }
+    )
 
-    useEffect(() => {
+    return (): void => processStatus()
+  }, [setPids])
 
-    }, [])
-
+  return pids
 }

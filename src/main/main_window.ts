@@ -1,13 +1,15 @@
 import icon from '../../resources/icon.png?asset'
-import { shell, BrowserWindow } from 'electron'
+import { shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
+import createProcessWindow from './process_window'
 
 function createMainWindow(route: string): void {
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
+    title: 'Echo Server Creator',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -35,5 +37,9 @@ function createMainWindow(route: string): void {
     mainWindow.loadURL(buildLocation)
   }
 }
+
+ipcMain.on('main-maindow:open-process-viewer', (event, processObject) =>
+  createProcessWindow(`/process/`, processObject.pid)
+)
 
 export default createMainWindow

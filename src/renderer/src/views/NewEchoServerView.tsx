@@ -1,7 +1,6 @@
 import ActionButton from '@renderer/components/ActionButton'
 import InputForm from '@renderer/components/InputForm'
 import Title from '@renderer/components/Title'
-import { ipcRenderer } from 'electron'
 import { ReactElement, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -26,15 +25,14 @@ export default function NewEchoServerView(): ReactElement {
   }
 
   const handleCreate = (): void => {
-    console.log(echoProcessAPI)
     console.log(`host: ${host}, port: ${port}, message: ${message}`)
     echoProcessAPI.send(launchChannel, host, port, message)
   }
 
   useEffect(() => {
-    const processStatus = echoProcessAPI.receive(launchedChannel, (event, pid, host, port, message) => {
-      console.log("UseEffect: event", event)
-      console.log(`UseEffect: pid: ${pid}, message: ${message}, host: ${host}, port: ${port}`)
+    const processStatus = echoProcessAPI.receive(launchedChannel, (event, processObject) => {
+      navigate('/main')
+      console.log('UseEffect: processObject', processObject)
     })
 
     return (): void => processStatus()
